@@ -1,0 +1,28 @@
+{
+  "app": {
+    "badge": "ZESZYT 02"
+  },
+  "nav": {
+    "label": "Разделы",
+    "lessons": "Уроки",
+    "exercises": "Задания",
+    "cheatsheet": "Шпаргалка",
+    "mistakes": "Мои ошибки"
+  },
+  "apiStatus": {
+    "label": "API:",
+    "connecting": "подключение…",
+    "unavailable": "недоступен"
+  },
+  "placeholder": {
+    "kicker": "Скоро",
+    "lessons": "Курс A1–A2: падежи, глаголы, числительные.",
+    "exercises": "Сессии по 10 заданий с разбором Claude.",
+    "cheatsheet": "Таблицы склонения, предлоги, числа.",
+    "mistakes": "Ошибки из сессий и повторение."
+  },
+  "notFound": {
+    "title": "Страница не найдена",
+    "note": "Такой страницы нет."
+  }
+}

@@ -1,0 +1,717 @@
+# DESIGN SYSTEM & UI SPECIFICATION: "Mów po polsku!" (Polish Poster × Editorial Hybrid)
+
+## 1. Core Aesthetic & Philosophy
+- **Concept:** A hybrid of *Polska Szkoła Plakatu* (1960s Polish poster art) and contemporary Polish intellectual editorial design (e.g., *Przekrój*, *Zwykłe Życie*).
+- **Anti-Patterns (STRICTLY FORBIDDEN):**
+  - NO generic SaaS gradients, glassmorphism, or neon glows.
+  - NO rounded "pill" buttons or soft drop shadows (`box-shadow` with blur > 0).
+  - NO uniform Bento grids with `border-radius: 16px`.
+  - NO childish mascots or gamified streak flames.
+- **Tactile Feel:** The interface must feel like printed matter on warm, uncoated cotton paper—combining clean editorial reading space with bold, hand-cut collage accents and ink annotations.
+
+## 2. Color Palette (CSS Variables)
+
+:root {
+  --bg-paper: #F4EFE6;          /* Warm uncoated paper base */
+  --bg-surface: #EBE4D8;        /* Slightly darker paper for cards/tickets */
+  --ink-black: #181818;         /* Primary text, borders, structural lines */
+  --ink-muted: #57534E;         /* Secondary captions, metadata */
+  --accent-vermilion: #D9381E;  /* Polish poster red (highlights, active states, hand-drawn circles) */
+  --accent-cobalt: #1D4ED8;     /* Secondary poster blue (grammatical markers) */
+  --accent-ochre: #D97706;      /* Warm mustard/ochre for paper cutouts */
+  --border-hairline: rgba(24, 24, 24, 0.25);
+}
+
+
+3. Typography & Polish Diacritics
+Font Pairing:
+
+Display / Headings: Bold, slightly condensed grotesque with strong personality and well-crafted Polish diacritics (ą, ć, ę, ł, ń, ó, ś, ź, ż). Recommended: 'Oswald', 'Archivo Black', or 'Syne' (Google Fonts, subset: latin-ext).
+
+Editorial / Reading Text: High-readability literary serif for dialogues, vocabulary definitions, and cultural notes. Recommended: 'Newsreader', 'Lora', or 'Playfair Display' (latin-ext).
+
+Handwritten Annotations / Marginalia: Casual ink script for margin notes. Recommended: 'Caveat' (latin-ext).
+
+Rules:
+
+Headings are uppercase, tight line-height (0.95 to 1.05), tracking -0.02em.
+
+Always test rendering of ą, ę, ł, ż, ź to ensure ogonek tails do not clip.
+
+4. Layout & Grid Architecture
+Asymmetric Two-Column Split:
+
+Left Column (55%): Interactive lesson workspace, dialogues, real-world artifacts (receipts, café menus, street signs) combined with bold poster-style cutouts.
+
+Right Column (45%): Editorial dictionary, cultural marginalia, and interactive exercises separated by crisp 1px solid var(--ink-black) vertical dividers.
+
+Geometry:
+
+Strict 0px border-radius on all containers, inputs, and buttons.
+
+Use subtle rotation (transform: rotate(-1.5deg) or 1deg) ONLY on collage elements, photo cutouts, and stamp badges to simulate manual pasting.
+
+5. Component Specifications
+Buttons:
+
+Flat background (--bg-paper or --ink-black), 1.5px solid var(--ink-black), 0px border-radius.
+
+Hover state: Hard offset shadow (box-shadow: 4px 4px 0px var(--ink-black); transform: translate(-2px, -2px);) or instant color inversion (--accent-vermilion).
+
+Marginalia & Ink Annotations:
+
+Interactive words in dialogues can be circled with an SVG hand-drawn red ink stroke (--accent-vermilion).
+
+Clicking/hovering reveals a margin note in --ink-muted / --accent-vermilion with a curved SVG arrow pointing to the word.
+
+Progress Tracker ("Bilet Wstępu" / Ticket):
+
+Styled as a perforated tram/museum ticket at the bottom of the screen with notched side edges (radial-gradient cutouts) and a red marker/stamp showing completed modules (ZROBIONE!).
+
+Audio Player:
+
+Minimalist editorial trigger ([ ▶ POSŁUCHAJ ]) paired with an abstract poster-art ear/mouth collage visual rather than a generic waveform bar.
+
+
+---
+
+### Готовый HTML/CSS-макет (прототип главной рабочей страницы урока)
+
+Сохраните этот код как `index.html` и откройте в браузере — это живой прототип концепции «Гибрид плаката и журнала»[cite: 5] с рабочими интерактивными состояниями (выбор слова в диалоге, проверка ответа, переключатель озвучки и билет прогресса):
+
+```html
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UCZ SIĘ POLSKIEGO! — Lekcja 4: Jedzenie i słowa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat:wght@600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-paper: #F4EFE6;
+      --bg-surface: #EAE2D3;
+      --ink-black: #181818;
+      --ink-muted: #524E48;
+      --accent-vermilion: #D9381E;
+      --accent-cobalt: #1E40AF;
+      --accent-ochre: #D49A3A;
+      --hairline: rgba(24, 24, 24, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-paper);
+      color: var(--ink-black);
+      font-family: 'Newsreader', Georgia, serif;
+      line-height: 1.55;
+      /* Легкая зернистость бумаги */
+      background-image: radial-gradient(rgba(24, 24, 24, 0.04) 1px, transparent 0);
+      background-size: 16px 16px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      border-bottom: 2px solid var(--ink-black);
+      padding: 1.25rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 2.1rem;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-badge {
+      background: var(--accent-vermilion);
+      color: var(--bg-paper);
+      font-size: 0.75rem;
+      padding: 0.15rem 0.45rem;
+      transform: rotate(-3deg);
+      letter-spacing: 0.05em;
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--ink-black);
+      padding-bottom: 2px;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    nav a:hover, nav a.active {
+      border-bottom-color: var(--accent-vermilion);
+    }
+
+    /* MAIN GRID */
+    main {
+      display: grid;
+      grid-template-columns: 1.2fr 0.95fr;
+      flex: 1;
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .col-left {
+      padding: 2.25rem 2.5rem;
+      border-right: 1.5px solid var(--ink-black);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .col-right {
+      padding: 2.25rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .section-kicker {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-kicker::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--hairline);
+    }
+
+    /* COLLAGE ARTWORK BLOCK */
+    .poster-collage {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.5rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .photo-cutout {
+      position: relative;
+      border: 1.5px solid var(--ink-black);
+      background: #D8CFC0;
+      padding: 0.6rem;
+      transform: rotate(-1.2deg);
+      box-shadow: 5px 5px 0px var(--ink-black);
+    }
+
+    .photo-placeholder {
+      width: 100%;
+      height: 190px;
+      background: linear-gradient(135deg, #3c3834 0%, #1c1a18 100%);
+      color: var(--bg-paper);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1rem;
+      font-family: 'Oswald', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .photo-placeholder span.sign {
+      border: 1px solid rgba(244,239,230,0.4);
+      padding: 0.2rem 0.5rem;
+      font-size: 0.8rem;
+      align-self: flex-start;
+      letter-spacing: 0.08em;
+    }
+
+    .cutout-label {
+      position: absolute;
+      bottom: -14px;
+      left: 14px;
+      background: var(--ink-black);
+      color: var(--bg-paper);
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
+      padding: 0.25rem 0.85rem;
+      letter-spacing: 0.04em;
+      transform: rotate(1.5deg);
+    }
+
+    .diacritics-burst {
+      position: relative;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .letters-scatter {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 2.2rem;
+      line-height: 1;
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .letters-scatter span:nth-child(1) { transform: rotate(-8deg); color: var(--ink-black); }
+    .letters-scatter span:nth-child(2) { transform: rotate(6deg) translateY(-6px); color: var(--accent-vermilion); }
+    .letters-scatter span:nth-child(3) { transform: rotate(-4deg); color: var(--ink-black); }
+    .letters-scatter span:nth-child(4) { transform: rotate(11deg) translateY(4px); color: var(--accent-cobalt); }
+
+    .plate-graphic {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: var(--accent-vermilion);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 2px solid var(--ink-black);
+    }
+
+    .plate-inner {
+      width: 102px;
+      height: 102px;
+      border-radius: 50%;
+      background: var(--bg-paper);
+      border: 2px solid var(--ink-black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-align: center;
+      line-height: 1.1;
+    }
+
+    /* DIALOGUE & MARGINALIA */
+    .dialogue-box {
+      position: relative;
+      padding: 1.25rem 0;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .dialogue-line {
+      font-size: 1.45rem;
+      margin-bottom: 0.55rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+    }
+
+    .speaker-dash {
+      font-weight: 600;
+      color: var(--accent-vermilion);
+    }
+
+    .clickable-word {
+      position: relative;
+      cursor: pointer;
+      padding: 0 0.3rem;
+      font-weight: 600;
+      border: 2px solid var(--accent-vermilion);
+      border-radius: 50% 45% 55% 40% / 45% 55% 40% 50%;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .clickable-word:hover, .clickable-word.selected {
+      background: var(--accent-vermilion);
+      color: var(--bg-paper);
+    }
+
+    .marginalia-note {
+      font-family: 'Caveat', cursive;
+      font-size: 1.35rem;
+      color: var(--accent-vermilion);
+      margin-top: 0.5rem;
+      padding-left: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      line-height: 1.2;
+    }
+
+    /* BUTTONS */
+    .action-bar {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn-editorial {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.75rem 1.75rem;
+      background: var(--bg-paper);
+      color: var(--ink-black);
+      border: 1.5px solid var(--ink-black);
+      border-radius: 0;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s, background-color 0.12s, color 0.12s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-editorial:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 4px 4px 0px var(--ink-black);
+    }
+
+    .btn-editorial.primary {
+      background: var(--ink-black);
+      color: var(--bg-paper);
+    }
+
+    .btn-editorial.primary:hover {
+      background: var(--accent-vermilion);
+      border-color: var(--ink-black);
+    }
+
+    /* RIGHT COLUMN: POSTER + EDITORIAL DICTIONARY */
+    .right-top-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .poster-mini {
+      background: var(--bg-surface);
+      border: 1.5px solid var(--ink-black);
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .poster-mini h2 {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 2.35rem;
+      line-height: 0.95;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .poster-cutout-tag {
+      display: inline-block;
+      background: var(--ink-black);
+      color: var(--bg-paper);
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.35rem 0.7rem;
+      transform: rotate(-2deg);
+      margin-top: 0.5rem;
+    }
+
+    .editorial-dict {
+      border-left: 1px solid var(--hairline);
+      padding-left: 1.25rem;
+    }
+
+    .dict-entry {
+      margin-bottom: 1.25rem;
+    }
+
+    .dict-headword {
+      font-weight: 600;
+      font-size: 1.15rem;
+    }
+
+    .dict-headword span {
+      color: var(--accent-vermilion);
+      font-style: italic;
+    }
+
+    .dict-desc {
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+      margin-top: 0.25rem;
+    }
+
+    .false-friend-box {
+      background: rgba(217, 56, 30, 0.08);
+      border-left: 3px solid var(--accent-vermilion);
+      padding: 0.75rem 0.9rem;
+      font-size: 0.92rem;
+    }
+
+    .false-friend-box strong {
+      font-family: 'Oswald', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.8rem;
+      color: var(--accent-vermilion);
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    /* TICKET PROGRESS BAR */
+    .ticket-wrapper {
+      margin-top: auto;
+    }
+
+    .ticket {
+      background: var(--bg-surface);
+      border: 1.5px solid var(--ink-black);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      position: relative;
+    }
+
+    .ticket-segment {
+      padding: 1rem;
+      text-align: center;
+      border-right: 1.5px dashed var(--ink-black);
+      position: relative;
+    }
+
+    .ticket-segment:last-child {
+      border-right: none;
+    }
+
+    .ticket-level {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+    }
+
+    .scribble-bar {
+      height: 10px;
+      margin-top: 0.4rem;
+      background: repeating-linear-gradient(
+        -55deg,
+        var(--accent-vermilion),
+        var(--accent-vermilion) 4px,
+        transparent 4px,
+        transparent 7px
+      );
+    }
+
+    .stamp-done {
+      display: inline-block;
+      margin-top: 0.35rem;
+      border: 1.5px solid var(--ink-black);
+      padding: 0.1rem 0.4rem;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      transform: rotate(-3deg);
+      background: var(--bg-paper);
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      .col-left {
+        border-right: none;
+        border-bottom: 1.5px solid var(--ink-black);
+      }
+      .right-top-grid, .poster-collage {
+        grid-template-columns: 1fr;
+      }
+      .editorial-dict {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--hairline);
+        padding-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      UCZ SIĘ POLSKIEGO!
+      <span class="logo-badge">ZESZYT 04</span>
+    </div>
+    <nav>
+      <a href="#" class="active">Lekcje</a>
+      <a href="#">Plakaty</a>
+      <a href="#">Słownik</a>
+      <a href="#">Czytelnia</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- LEWA KOLUMNA: SCENA + DIALOG + MARGINALIA -->
+    <section class="col-left">
+      <div>
+        <div class="section-kicker">Lekcja 4: Jedzenie i słowa w mieście</div>
+
+        <div class="poster-collage">
+          <div class="photo-cutout">
+            <div class="photo-placeholder">
+              <span class="sign">BAR MLECZNY „PRASOWY”</span>
+              <div style="font-family: 'Newsreader', serif; font-style: italic; font-size: 0.95rem; opacity: 0.85;">
+                Warszawa, ul. Marszałkowska — godz. 13:15
+              </div>
+            </div>
+            <div class="cutout-label">SMACZNEGO!</div>
+          </div>
+
+          <div class="diacritics-burst">
+            <div class="letters-scatter">
+              <span>Ą</span>
+              <span>Ę</span>
+              <span>Ł</span>
+              <span>Ż</span>
+            </div>
+            <div class="plate-graphic">
+              <div class="plate-inner">ŻUREK<br>W CHLEBIE</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialogue-box">
+          <div class="dialogue-line">
+            <span class="speaker-dash">—</span>
+            <span>Poproszę pierogi.</span>
+          </div>
+          <div class="dialogue-line">
+            <span class="speaker-dash">—</span>
+            <span>Z czym?</span>
+          </div>
+          <div class="dialogue-line">
+            <span class="speaker-dash">—</span>
+            <span><span class="clickable-word selected" id="wordTrigger">Ruskie!</span></span>
+          </div>
+
+          <div class="marginalia-note" id="marginaliaBox">
+            ↖ Tradycyjne z twarogiem, ziemniakami i cebulką (nie z Rosji — nazwa od Rusi Czerwonej).
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button class="btn-editorial" id="audioBtn">▶ POSŁUCHAJ DIALOGU</button>
+        <button class="btn-editorial primary" id="quizBtn">ĆWICZ WYMOWĘ</button>
+      </div>
+    </section>
+
+    <!-- PRAWA KOLUMNA: PLAKAT + SŁOWNIK REDAKCYJNY + BILET POSTĘPU -->
+    <section class="col-right">
+      <div>
+        <div class="section-kicker">Słownik i metafory</div>
+
+        <div class="right-top-grid">
+          <div class="poster-mini">
+            <h2>ŻYWY<br>JĘZYK</h2>
+            <p style="font-size: 0.95rem; color: var(--ink-muted);">
+              Słuchaj uważnie melodii zdania i akcentu na przedostatnią sylabę.
+            </p>
+            <div class="poster-cutout-tag">AKCENT: -RO-GI</div>
+          </div>
+
+          <div class="editorial-dict">
+            <div class="dict-entry">
+              <div class="dict-headword">obiad <span>vs</span> kolacja</div>
+              <p class="dict-desc">
+                <strong>Obiad</strong> jemy między 13:00 a 16:00 (główny ciepły posiłek). <strong>Kolacja</strong> to lekki posiłek wieczorem.
+              </p>
+            </div>
+
+            <div class="false-friend-box">
+              <strong>Uwaga! Fałszywy przyjaciel:</strong>
+              „Poproszę <em>kawior</em>” czy „<em>sklep</em>”? Pamiętaj, że <strong>sklep</strong> to po polsku магазин, a piwnica to <em>piwnica</em>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-wrapper">
+        <div class="section-kicker">Twój rozdział (Bilet wstępu)</div>
+        <div class="ticket">
+          <div class="ticket-segment">
+            <div class="ticket-level">A1</div>
+            <div class="scribble-bar"></div>
+          </div>
+          <div class="ticket-segment">
+            <div class="ticket-level">A2</div>
+            <div class="scribble-bar" style="width: 65%;"></div>
+          </div>
+          <div class="ticket-segment">
+            <div class="ticket-level">B1</div>
+            <span class="stamp-done">CEL SEMESTRU</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const audioBtn = document.getElementById('audioBtn');
+    const quizBtn = document.getElementById('quizBtn');
+    const wordTrigger = document.getElementById('wordTrigger');
+    const marginaliaBox = document.getElementById('marginaliaBox');
+
+    let playing = false;
+    audioBtn.addEventListener('click', () => {
+      playing = !playing;
+      audioBtn.textContent = playing ? '❚❚ ODTWARZANIE (0:04)...' : '▶ POSŁUCHAJ DIALOGU';
+      if (playing) {
+        setTimeout(() => {
+          playing = false;
+          audioBtn.textContent = '▶ POSŁUCHAJ DIALOGU';
+        }, 3000);
+      }
+    });
+
+    wordTrigger.addEventListener('click', () => {
+      wordTrigger.classList.toggle('selected');
+      marginaliaBox.style.opacity = wordTrigger.classList.contains('selected') ? '1' : '0.35';
+    });
+
+    quizBtn.addEventListener('click', () => {
+      quizBtn.textContent = '✓ ŚWIETNIE! NASTĘPNE ZDANIE →';
+      quizBtn.style.background = 'var(--accent-vermilion)';
+    });
+  </script>
+</body>
+</html>
+Что стоит дополнительно подсказать агенту при интеграции:
+Сделайте маргиналии интерактивным компонентом: чтобы в каждом уроке выделенные слова в тексте или диалоге открывали рукописную заметку на полях (как в коде выше с pierogi ruskie).
+
+Используйте реальные артефакты вместо абстрактных карточек: на месте темного блока BAR MLECZNY „PRASOWY” можно вставлять стилизованные фото польских вывесок, чеков из Żabka, билетов PKP или страниц меню.

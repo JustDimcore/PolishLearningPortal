@@ -1,0 +1,22 @@
+# Run the built app locally: docker compose up --build
+# Ports are bound to 127.0.0.1 only: the server runs the local Claude CLI and must not be reachable from the network.
+name: polish-app
+
+services:
+  api:
+    build: .
+    image: polish-app:local
+    ports:
+      - "127.0.0.1:${APP_PORT:-8480}:8080"
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://aspire-dashboard:18889
+    depends_on:
+      - aspire-dashboard
+
+  # Logs, traces and metrics: http://127.0.0.1:18888
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:13
+    ports:
+      - "127.0.0.1:18888:18888"
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"

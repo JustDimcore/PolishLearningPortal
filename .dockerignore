@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/TestResults/
+src/Api/wwwroot/
+.git/
+.github/
+.vs/
+.idea/
+.claude/
+.env
+*.user
+tests/
+style_doc.txt

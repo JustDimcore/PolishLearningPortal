@@ -1,0 +1,30 @@
+# .NET
+bin/
+obj/
+TestResults/
+*.user
+.vs/
+
+# Node / client
+node_modules/
+web/dist/
+*.tsbuildinfo
+
+# Client build is copied into wwwroot only when building the image
+src/Api/wwwroot/
+
+# Secrets and local data
+.env
+.env.*
+!.env.example
+data/
+
+# Claude Code: keep local settings out, commit agents
+.claude/settings.local.json
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
