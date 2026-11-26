@@ -9,7 +9,7 @@ COPY web/ ./
 RUN npm run build
 
 # --- 2. API: dotnet publish, client build goes into wwwroot ---
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS api
 WORKDIR /src
 COPY Directory.Build.props Directory.Packages.props .editorconfig ./
 COPY src/Api/Api.csproj src/Api/
