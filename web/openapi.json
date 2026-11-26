@@ -1,0 +1,641 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Api | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/version": {
+      "get": {
+        "tags": [
+          "AppInfo"
+        ],
+        "summary": "API version",
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lessons": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "Course outline: lesson groups in order",
+        "operationId": "GetCourse",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseOutline"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lessons/{slug}": {
+      "get": {
+        "tags": [
+          "Lessons"
+        ],
+        "summary": "A lesson with its sections and neighbours",
+        "operationId": "GetLesson",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CourseGroup": {
+        "required": [
+          "id",
+          "title",
+          "lessons"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "lessons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonLink"
+            }
+          }
+        }
+      },
+      "CourseOutline": {
+        "required": [
+          "groups"
+        ],
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseGroup"
+            }
+          }
+        }
+      },
+      "DialogueLine": {
+        "required": [
+          "text",
+          "translation",
+          "remark"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          },
+          "translation": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          },
+          "remark": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ExampleItem": {
+        "required": [
+          "label",
+          "text",
+          "translation"
+        ],
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "text": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          },
+          "translation": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          }
+        }
+      },
+      "InlineMark": {
+        "enum": [
+          "bold",
+          "italic",
+          "ending"
+        ]
+      },
+      "InlineSpan": {
+        "required": [
+          "text",
+          "marks"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "marks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineMark"
+            }
+          }
+        }
+      },
+      "LessonBlock": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/LessonBlockParagraphBlock"
+          },
+          {
+            "$ref": "#/components/schemas/LessonBlockNoteBlock"
+          },
+          {
+            "$ref": "#/components/schemas/LessonBlockBulletListBlock"
+          },
+          {
+            "$ref": "#/components/schemas/LessonBlockTableBlock"
+          },
+          {
+            "$ref": "#/components/schemas/LessonBlockExamplesBlock"
+          },
+          {
+            "$ref": "#/components/schemas/LessonBlockDialogueBlock"
+          },
+          {
+            "$ref": "#/components/schemas/LessonBlockCardBlock"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "paragraph": "#/components/schemas/LessonBlockParagraphBlock",
+            "note": "#/components/schemas/LessonBlockNoteBlock",
+            "list": "#/components/schemas/LessonBlockBulletListBlock",
+            "table": "#/components/schemas/LessonBlockTableBlock",
+            "examples": "#/components/schemas/LessonBlockExamplesBlock",
+            "dialogue": "#/components/schemas/LessonBlockDialogueBlock",
+            "card": "#/components/schemas/LessonBlockCardBlock"
+          }
+        }
+      },
+      "LessonBlockBulletListBlock": {
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "list"
+            ],
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichLine"
+            }
+          }
+        }
+      },
+      "LessonBlockCardBlock": {
+        "required": [
+          "title",
+          "caption",
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "card"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "caption": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichLine"
+            }
+          }
+        }
+      },
+      "LessonBlockDialogueBlock": {
+        "required": [
+          "caption",
+          "lines"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "dialogue"
+            ],
+            "type": "string"
+          },
+          "caption": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DialogueLine"
+            }
+          }
+        }
+      },
+      "LessonBlockExamplesBlock": {
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "examples"
+            ],
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExampleItem"
+            }
+          }
+        }
+      },
+      "LessonBlockNoteBlock": {
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "note"
+            ],
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          }
+        }
+      },
+      "LessonBlockParagraphBlock": {
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "paragraph"
+            ],
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          }
+        }
+      },
+      "LessonBlockTableBlock": {
+        "required": [
+          "header",
+          "rows"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "table"
+            ],
+            "type": "string"
+          },
+          "header": {
+            "$ref": "#/components/schemas/RichRow"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichRow"
+            }
+          }
+        }
+      },
+      "LessonDetail": {
+        "required": [
+          "slug",
+          "number",
+          "title",
+          "subtitle",
+          "summary",
+          "minutes",
+          "group",
+          "sections",
+          "previous",
+          "next"
+        ],
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          },
+          "minutes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "group": {
+            "$ref": "#/components/schemas/LessonGroupPosition"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonSection"
+            }
+          },
+          "previous": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LessonLink"
+              }
+            ]
+          },
+          "next": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LessonLink"
+              }
+            ]
+          }
+        }
+      },
+      "LessonGroupPosition": {
+        "required": [
+          "id",
+          "title",
+          "position",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "LessonLink": {
+        "required": [
+          "slug",
+          "number",
+          "title",
+          "subtitle"
+        ],
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          }
+        }
+      },
+      "LessonSection": {
+        "required": [
+          "id",
+          "number",
+          "title",
+          "blocks"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LessonBlock"
+            }
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RichLine": {
+        "required": [
+          "content"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          }
+        }
+      },
+      "RichRow": {
+        "required": [
+          "cells"
+        ],
+        "type": "object",
+        "properties": {
+          "cells": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichLine"
+            }
+          }
+        }
+      },
+      "VersionResponse": {
+        "required": [
+          "name",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "AppInfo"
+    },
+    {
+      "name": "Lessons"
+    }
+  ]
+}

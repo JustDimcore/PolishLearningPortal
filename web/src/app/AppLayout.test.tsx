@@ -1,13 +1,12 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
-import { createMemoryRouter, RouterProvider } from 'react-router'
+import { screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { t } from '../i18n/index.ts'
 import { PlaceholderPage } from '../pages/PlaceholderPage.tsx'
+import { renderRoutes } from '../test/render.tsx'
 import { AppLayout } from './AppLayout.tsx'
 
 function renderAt(path: string) {
-  const router = createMemoryRouter(
+  return renderRoutes(
     [
       {
         element: <AppLayout />,
@@ -17,13 +16,7 @@ function renderAt(path: string) {
         ],
       },
     ],
-    { initialEntries: [path] },
-  )
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  return render(
-    <QueryClientProvider client={client}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
+    path,
   )
 }
 

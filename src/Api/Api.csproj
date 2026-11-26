@@ -3,14 +3,27 @@
   <PropertyGroup>
     <RootNamespace>PolishApp.Api</RootNamespace>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- The OpenAPI document is generated on build into web/ for the client code generator. -->
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)/../../web</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocumentsOptions>--file-name openapi</OpenApiGenerateDocumentsOptions>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Learning content is read from disk at startup; README.md documents the format and is not shipped. -->
+    <Content Include="../../content/**/*.md;../../content/**/*.yaml" Exclude="../../content/README.md" LinkBase="content" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Api.Tests" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Markdig" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
@@ -19,6 +32,7 @@
     <PackageReference Include="Scalar.AspNetCore" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
+    <PackageReference Include="YamlDotNet" />
   </ItemGroup>
 
 </Project>

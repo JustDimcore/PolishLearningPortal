@@ -1,0 +1,6 @@
+groups:
+  - id: cases
+    title: Падежи
+    lessons:
+      - mianownik
+      - dopelniacz

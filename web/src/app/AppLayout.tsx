@@ -1,6 +1,6 @@
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet, ScrollRestoration } from 'react-router'
 import { t } from '../i18n/index.ts'
-import { useApiVersion } from '../shared/api/version.ts'
+import { useGetVersion } from '../shared/api/generated/app-info/app-info.ts'
 
 const sections = [
   { to: '/lessons', label: t.nav.lessons },
@@ -10,7 +10,7 @@ const sections = [
 ]
 
 export function AppLayout() {
-  const version = useApiVersion()
+  const version = useGetVersion()
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -19,7 +19,7 @@ export function AppLayout() {
           Mów po polsku!
           <span className="-rotate-3 bg-vermilion-dark px-1.5 py-0.5 text-xs tracking-wider text-paper">{t.app.badge}</span>
         </div>
-        <nav aria-label={t.nav.label}className="flex flex-wrap gap-7 font-display text-base tracking-wide uppercase">
+        <nav aria-label={t.nav.label} className="flex flex-wrap gap-x-5 font-display text-base tracking-wide uppercase md:gap-x-7">
           {sections.map((s) => (
             <NavLink
               key={s.to}
@@ -37,6 +37,7 @@ export function AppLayout() {
       <div className="flex-1">
         <Outlet />
       </div>
+      <ScrollRestoration />
 
       <footer className="border-t border-hairline px-4 py-3 text-sm text-muted md:px-10">
         {t.apiStatus.label}{' '}

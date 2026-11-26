@@ -42,7 +42,10 @@ internal static class ObservabilityExtensions
                     };
                 });
             }
-        });
+        },
+        // Keep the static bootstrap logger untouched: freezing it would break a second host in the same
+        // process (integration tests start one per fixture).
+        preserveStaticLogger: true);
 
         var otel = builder.Services.AddOpenTelemetry()
             .ConfigureResource(resource => resource.AddService(ServiceName))

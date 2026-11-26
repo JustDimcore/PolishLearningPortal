@@ -24,6 +24,9 @@ jobs:
       - run: dotnet restore
       - run: dotnet build --no-restore -c Release
       - run: dotnet test --no-build -c Release
+      # The build regenerates web/openapi.json; a diff means the committed contract is stale.
+      - name: OpenAPI document is up to date
+        run: git diff --exit-code -- web/openapi.json
 
   web:
     name: Web · lint, test, build
@@ -39,6 +42,10 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
+      - name: Generated API client is up to date
+        run: |
+          npm run api:generate
+          git diff --exit-code -- src/shared/api/generated
       - run: npm run lint
       - run: npm test
       - run: npm run build

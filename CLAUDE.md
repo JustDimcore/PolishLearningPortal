@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Статус проекта
 
-Есть каркас: API с health/version/OpenAPI/логами/трассировкой, React-клиент с роутингом и заглушками разделов, Docker, compose, CI. Фич волны 1 пока нет. Дизайн согласован в макетах (Artifact «Polish App — направления дизайна», страница «Раунд 4 · Mów po polsku!»). Пометка «план» — то, чего в коде ещё нет; при реализации убирай её.
+Есть каркас (API с health/version/OpenAPI/логами/трассировкой, React-клиент, Docker, compose, CI) и первая фича волны 1 — **уроки** (Mianownik, Dopełniacz). Остальные разделы — заглушки. Дизайн согласован в макетах (Artifact «Polish App — направления дизайна», страница «Раунд 4 · Mów po polsku!»). Пометка «план» — то, чего в коде ещё нет; при реализации убирай её.
 
 ## Команды
 
@@ -23,14 +23,15 @@ dotnet run --project src/Api          # API на http://127.0.0.1:5080, Scalar: 
 npm run dev --prefix web              # клиент на http://127.0.0.1:5173, /api и /health проксируются на 5080
 
 # Бэкенд
-dotnet build
+dotnet build                          # заодно перегенерирует web/openapi.json
 dotnet test                           # xUnit v3 на Microsoft.Testing.Platform (см. global.json)
 dotnet test --project tests/Api.Tests -- --filter-method "*Version*"   # один тест
 
 # Клиент (из web/)
 npm run lint                          # oxlint
 npm test                              # vitest run
-npx vitest run src/app/AppLayout.test.tsx -t "недоступен"             # один тест
+npx vitest run src/app/AppLayout.test.tsx -t "unavailable"            # один тест
+npm run api:generate                  # Orval: клиент и Zod-схемы из openapi.json (после dotnet build)
 npm run build
 
 # Собранное приложение + Aspire Dashboard
@@ -49,7 +50,7 @@ docker compose up --build             # приложение: http://127.0.0.1:8
   - Пакеты — централизованно в `Directory.Packages.props`. `Microsoft.AspNetCore.*` держим на 10.x: версии 11.x требуют net11.0.
   - `Directory.Build.props`: `TreatWarningsAsErrors`, анализаторы `latest-recommended`.
   - Неизвестный `/api/*` отдаёт 404 ProblemDetails; остальные пути — `index.html` клиента (SPA fallback).
-- **Frontend:** React 19 + Vite + TypeScript, Tailwind v4 (токены дизайна в `web/src/index.css` → `@theme`), React Router, TanStack Query, oxlint, Vitest + Testing Library. Генерация TS-клиента и Zod-схем из OpenAPI (Orval) — план; пока `web/src/shared/api/` пишется вручную.
+- **Frontend:** React 19 + Vite + TypeScript, Tailwind v4 (токены дизайна в `web/src/index.css` → `@theme`), React Router, TanStack Query, oxlint, Vitest + Testing Library. TS-клиент (хуки TanStack Query) и Zod-схемы генерирует Orval из `web/openapi.json` в `web/src/shared/api/generated/` — руками не правится. Контракт меняется так: правка C# → `dotnet build` → `npm run api:generate` → коммит обоих файлов; CI падает, если они устарели.
 - **Хранилище:**
   - Пользовательское состояние (прогресс, ошибки, результаты сессий, позже — интервальное повторение) — **на клиенте** (IndexedDB), с экспортом/импортом JSON. Сервер пользовательских данных не хранит.
   - На сервере — только то, что не относится к пользователю: кэш ответов Claude и сгенерированные задания (PostgreSQL + EF Core, план).
@@ -63,21 +64,23 @@ docker compose up --build             # приложение: http://127.0.0.1:8
 ## Архитектура
 
 ```
-content/              уроки, шпаргалки, банк заданий (план)
+content/              уроки (формат — content/README.md); шпаргалки, банк заданий (план)
 src/Api/
   Features/AppInfo/   GET /api/version
+  Features/Lessons/   разбор Markdown урока в блоки, каталог курса, GET /api/lessons[/{slug}]
   Infrastructure/     логи, трассировка, health (/health/live, /health/ready)
-tests/Api.Tests/      интеграционные тесты API
+tests/Api.Tests/      тесты API: парсер, каталог, эндпоинты (на настоящем content/)
 web/src/
   app/                роутер и общий layout (шапка с разделами)
-  pages/              страницы разделов (пока заглушки)
-  shared/api/         запросы к API через TanStack Query
+  features/lessons/   рендер блоков урока, навигация по курсу
+  pages/              страницы разделов (уроки; остальное — заглушки)
+  shared/api/         fetcher + generated/ (Orval)
 ```
 
 - **Браузер никогда не вызывает Claude напрямую.** CLI запускает только сервер, вся работа с ним — в одном модуле (`IClaudeClient` / `ClaudeCliClient`, фейк для CI).
 - **Задания — discriminated union по `type`** (`fill-gap`, `multiple-choice`, `declension-table`, `translation`, `find-error`). Новый формат = ветка схемы + рендерер на клиенте + (опционально) промпт генерации. Статические и сгенерированные задания проходят одну валидацию.
 - **Проверка ответов:** закрытые форматы — детерминированно, без Claude. Claude — для свободных ответов (перевод) и разбора ошибок. Ответ Claude — JSON по схеме; невалидный ответ = ошибка, а не показ «как есть».
-- **Контент грузится из файлов при старте**, не из БД.
+- **Контент грузится из файлов при старте**, не из БД. Сервер разбирает Markdown в типизированные блоки (discriminated union по `type`), клиент только рендерит. Любая ошибка формата останавливает запуск с файлом и строкой; неизвестная разметка — ошибка, а не «как есть».
 
 ## Набор фич
 

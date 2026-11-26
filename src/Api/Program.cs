@@ -1,4 +1,5 @@
 using PolishApp.Api.Features.AppInfo;
+using PolishApp.Api.Features.Lessons;
 using PolishApp.Api.Infrastructure;
 using Scalar.AspNetCore;
 using Serilog;
@@ -14,10 +15,17 @@ try
     builder.AddObservability();
 
     builder.Services.AddProblemDetails();
+    // Numbers are numbers: the default Web options also accept strings, which leaks into the OpenAPI schema.
+    builder.Services.ConfigureHttpJsonOptions(options =>
+        options.SerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.Strict);
     builder.Services.AddOpenApi();
     builder.Services.AddHealthChecks();
+    builder.Services.AddLessons(builder.Configuration);
 
     var app = builder.Build();
+
+    // Load content eagerly: an invalid lesson stops startup instead of failing the first request.
+    app.Services.GetRequiredService<LessonCatalog>();
 
     app.UseExceptionHandler();
     app.UseStatusCodePages();
@@ -33,6 +41,7 @@ try
 
     var api = app.MapGroup("/api");
     api.MapAppInfoEndpoints();
+    api.MapLessonsEndpoints();
 
     // Unknown /api/* routes return a ProblemDetails 404 instead of the client's index.html.
     api.MapFallback(() => Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Resource not found"));

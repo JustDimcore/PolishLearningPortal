@@ -8,10 +8,12 @@ updates:
       opentelemetry:
         patterns: ["OpenTelemetry*"]
       aspnetcore:
-        patterns: ["Microsoft.AspNetCore.*"]
+        patterns: ["Microsoft.AspNetCore.*", "Microsoft.Extensions.ApiDescription.Server"]
     ignore:
       # Stay on .NET 10 (LTS): 11.x packages require net11.0.
       - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Extensions.ApiDescription.Server"
         update-types: ["version-update:semver-major"]
 
   - package-ecosystem: npm

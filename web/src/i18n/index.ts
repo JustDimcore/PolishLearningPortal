@@ -6,3 +6,8 @@ import ru from './ru.json'
 export type Messages = typeof ru
 
 export const t: Messages = ru
+
+/** Fills `{name}` placeholders in a message: format(t.lessons.next, { number: 3 }). */
+export function format(message: string, values: Record<string, string | number>): string {
+  return message.replace(/\{(\w+)\}/g, (match, name: string) => (name in values ? String(values[name]) : match))
+}
