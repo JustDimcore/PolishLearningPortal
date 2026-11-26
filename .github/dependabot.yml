@@ -33,3 +33,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Stay on .NET 10 (LTS): the app targets net10.0, an 11.x runtime image cannot run it.
+      - dependency-name: "dotnet/sdk"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "dotnet/aspnet"
+        update-types: ["version-update:semver-major"]
