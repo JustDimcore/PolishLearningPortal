@@ -5,7 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from './answerCheck';
 export * from './cheatSheetResponse';
+export * from './checkRequest';
+export * from './checkResponse';
 export * from './contentBlock';
 export * from './contentBlockBulletListBlock';
 export * from './contentBlockBulletListBlockType';
@@ -24,10 +27,21 @@ export * from './contentBlockTableBlockType';
 export * from './contentSection';
 export * from './courseGroup';
 export * from './courseOutline';
+export * from './declensionRow';
 export * from './dialogueLine';
 export * from './exampleItem';
+export * from './exercise';
+export * from './exerciseDeclensionTableExercise';
+export * from './exerciseDeclensionTableExerciseType';
+export * from './exerciseFillGapExercise';
+export * from './exerciseFillGapExerciseType';
+export * from './exerciseMultipleChoiceExercise';
+export * from './exerciseMultipleChoiceExerciseType';
+export * from './exerciseSet';
+export * from './exerciseSetsResponse';
 export * from './formHit';
 export * from './formSearchResponse';
+export * from './gapText';
 export * from './inlineMark';
 export * from './inlineSpan';
 export * from './lessonDetail';
@@ -37,4 +51,7 @@ export * from './problemDetails';
 export * from './richLine';
 export * from './richRow';
 export * from './searchFormsParams';
+export * from './sessionResponse';
+export * from './startSessionParams';
+export * from './verdict';
 export * from './versionResponse';

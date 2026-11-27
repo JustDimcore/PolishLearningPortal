@@ -1,0 +1,118 @@
+lesson: mianownik
+exercises:
+  - id: mian-01
+    type: fill-gap
+    instruction: Поставьте слово во множественное число
+    sentence: To są ___.
+    base: kot
+    answers: [koty]
+    translation: Это коты.
+    explanation: "Мужской род (не о мужчинах), основа на твёрдую согласную — -y: *kot → koty*."
+
+  - id: mian-02
+    type: fill-gap
+    instruction: Поставьте слово во множественное число
+    sentence: Tu są ___.
+    base: kobieta
+    answers: [kobiety]
+    translation: Здесь женщины.
+    explanation: "Женский род на -a с твёрдой основой — во множественном -y: *kobieta → kobiety*."
+
+  - id: mian-03
+    type: fill-gap
+    instruction: Поставьте слово во множественное число
+    sentence: Tam są ___.
+    base: książka
+    answers: [książki]
+    translation: Там книги.
+    explanation: "После k и g вместо -y пишется -i: *książka → książki*."
+
+  - id: mian-04
+    type: fill-gap
+    instruction: Поставьте слово во множественное число
+    sentence: To są ___.
+    base: okno
+    answers: [okna]
+    translation: Это окна.
+    explanation: "Средний род — во множественном -a: *okno → okna*."
+
+  - id: mian-05
+    type: fill-gap
+    instruction: Поставьте слово во множественное число
+    sentence: Tu są ___.
+    base: ulica
+    answers: [ulice]
+    translation: Здесь улицы.
+    explanation: "Основа на c — окончание -e: *ulica → ulice*."
+
+  - id: mian-06
+    type: fill-gap
+    instruction: Поставьте слово во множественное число
+    sentence: To są ___.
+    base: morze
+    answers: [morza]
+    translation: Это моря.
+    explanation: "Средний род на -e — во множественном тоже -a: *morze → morza*."
+
+  - id: mian-07
+    type: fill-gap
+    instruction: Поставьте слово во множественное число
+    sentence: Tu są ___.
+    base: pokój
+    answers: [pokoje]
+    translation: Здесь комнаты.
+    explanation: "Основа на j — окончание -e. И ó переходит в o: *pokój → pokoje*."
+
+  - id: mian-08
+    type: multiple-choice
+    instruction: Выберите род слова
+    prompt: "*kawa* (кофе)"
+    options: [мужской, женский, средний]
+    answer: женский
+    explanation: "Слово на -a (если оно не называет мужчину) — женского рода, хотя русское «кофе» — нет."
+
+  - id: mian-09
+    type: multiple-choice
+    instruction: Выберите род слова
+    prompt: "*mężczyzna* (мужчина)"
+    options: [мужской, женский, средний]
+    answer: мужской
+    explanation: "Слова на -a, которые называют мужчин, — мужского рода."
+
+  - id: mian-10
+    type: multiple-choice
+    instruction: Выберите род слова
+    prompt: "*imię* (имя)"
+    options: [мужской, женский, средний]
+    answer: средний
+    explanation: "Слова на -ę — среднего рода."
+
+  - id: mian-11
+    type: multiple-choice
+    instruction: Выберите род слова
+    prompt: "*noc* (ночь)"
+    options: [мужской, женский, средний]
+    answer: женский
+    explanation: "Женское слово на согласную — его род запоминают вместе со словом."
+
+  - id: mian-12
+    type: multiple-choice
+    instruction: Выберите форму подлежащего
+    prompt: ___ śpi.
+    options: [Kot, Kota, Koty]
+    answer: Kot
+    translation: Кот спит.
+    explanation: "Подлежащее стоит в именительном падеже, а *śpi* — глагол в ед. ч.: нужна словарная форма *kot*."
+
+  - id: mian-13
+    type: declension-table
+    instruction: Заполните таблицу
+    word: książka
+    translation: книга
+    rows:
+      - label: Именительный · ед. ч.
+        answer: książka
+        given: true
+      - label: Именительный · мн. ч.
+        answer: książki
+    explanation: "После k во множественном -i, а не -y: *książki*."

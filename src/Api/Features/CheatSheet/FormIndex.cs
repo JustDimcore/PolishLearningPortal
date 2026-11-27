@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.RegularExpressions;
 using PolishApp.Api.Features.Content;
 
@@ -78,28 +77,8 @@ internal sealed partial class FormIndex
         return new FormSearchResponse(query, Exact: false, prefix);
     }
 
-    /// <summary>Lower-cases and strips Polish diacritics: "Łąka" → "laka".</summary>
-    public static string Normalize(string text)
-    {
-        var builder = new StringBuilder(text.Length);
-        foreach (var ch in text.ToLowerInvariant())
-        {
-            builder.Append(ch switch
-            {
-                'ą' => 'a',
-                'ć' => 'c',
-                'ę' => 'e',
-                'ł' => 'l',
-                'ń' => 'n',
-                'ó' => 'o',
-                'ś' => 's',
-                'ź' or 'ż' => 'z',
-                _ => ch,
-            });
-        }
-
-        return builder.ToString();
-    }
+    /// <summary>Search key of a form: lower-cased, without Polish diacritics.</summary>
+    public static string Normalize(string text) => PolishText.WithoutDiacritics(text);
 
     /// <summary>Words written in the Polish alphabet, two letters or longer; Russian glosses are skipped.</summary>
     private static IEnumerable<string> PolishWords(string text) =>

@@ -4,6 +4,7 @@ import { ContentBlocks } from '../../features/content/ContentBlocks.tsx'
 import { RichText } from '../../features/content/RichText.tsx'
 import { format, t } from '../../i18n/index.ts'
 import { ApiError } from '../../shared/api/fetcher.ts'
+import { useGetExerciseSets } from '../../shared/api/generated/exercises/exercises.ts'
 import { useGetCourse, useGetLesson } from '../../shared/api/generated/lessons/lessons.ts'
 import type { LessonDetail, LessonLink } from '../../shared/api/generated/model'
 import { PlaceholderPage } from '../PlaceholderPage.tsx'
@@ -89,6 +90,8 @@ function LessonView({ lesson }: { lesson: LessonDetail }) {
           </section>
         ))}
 
+        <Practice lesson={lesson} />
+
         {(lesson.previous || lesson.next) && (
           <nav
             aria-label={t.lessons.neighbours}
@@ -118,5 +121,27 @@ function Neighbour({ lesson, direction }: { lesson: LessonLink; direction: 'prev
       </span>
       <span className="text-[15px] text-muted">{lesson.subtitle}</span>
     </Link>
+  )
+}
+
+/** Call to practise, shown when the lesson has exercises. Numbered after the lesson's own sections. */
+function Practice({ lesson }: { lesson: LessonDetail }) {
+  const sets = useGetExerciseSets()
+  const set = sets.data?.sets.find((s) => s.lesson === lesson.slug)
+  if (!set) return null
+  return (
+    <section aria-labelledby="practice-title" className="border-[1.5px] border-ink bg-surface px-7 py-6">
+      <h2 id="practice-title" className="m-0 flex items-baseline gap-3 font-display text-xl font-bold tracking-[0.01em] uppercase">
+        <span className="text-vermilion-dark">{sectionNumber(lesson.sections.length + 1)}</span>
+        {t.lessons.practiceTitle}
+      </h2>
+      <p className="mt-2.5 mb-4 text-base leading-normal">{format(t.lessons.practiceNote, { count: set.count })}</p>
+      <Link
+        to={`/exercises/${lesson.slug}`}
+        className="inline-flex h-[42px] items-center border-[1.5px] border-ink bg-ink px-5 font-display text-sm tracking-[0.06em] text-paper uppercase no-underline hover:text-paper"
+      >
+        {t.lessons.practiceStart}
+      </Link>
+    </section>
   )
 }

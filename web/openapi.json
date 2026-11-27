@@ -140,10 +140,168 @@
           }
         }
       }
+    },
+    "/api/exercises": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Lessons that have exercises",
+        "operationId": "GetExerciseSets",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExerciseSetsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercises/session": {
+      "get": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Up to 10 exercises of a lesson, or the given exercises (ids=a,b,c), in random order",
+        "operationId": "StartSession",
+        "parameters": [
+          {
+            "name": "lesson",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercises/{id}/check": {
+      "post": {
+        "tags": [
+          "Exercises"
+        ],
+        "summary": "Check answers deterministically; an empty list means \"I don't know\"",
+        "operationId": "CheckAnswer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AnswerCheck": {
+        "required": [
+          "given",
+          "expected",
+          "verdict"
+        ],
+        "type": "object",
+        "properties": {
+          "given": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string"
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/Verdict"
+          }
+        }
+      },
       "CheatSheetResponse": {
         "required": [
           "title",
@@ -165,6 +323,45 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ContentSection"
+            }
+          }
+        }
+      },
+      "CheckRequest": {
+        "required": [
+          "answers"
+        ],
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CheckResponse": {
+        "required": [
+          "verdict",
+          "answers",
+          "explanation"
+        ],
+        "type": "object",
+        "properties": {
+          "verdict": {
+            "$ref": "#/components/schemas/Verdict"
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnswerCheck"
+            }
+          },
+          "explanation": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
             }
           }
         }
@@ -432,6 +629,24 @@
           }
         }
       },
+      "DeclensionRow": {
+        "required": [
+          "label",
+          "given"
+        ],
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "given": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "DialogueLine": {
         "required": [
           "text",
@@ -484,6 +699,193 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InlineSpan"
+            }
+          }
+        }
+      },
+      "Exercise": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ExerciseFillGapExercise"
+          },
+          {
+            "$ref": "#/components/schemas/ExerciseMultipleChoiceExercise"
+          },
+          {
+            "$ref": "#/components/schemas/ExerciseDeclensionTableExercise"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "fill-gap": "#/components/schemas/ExerciseFillGapExercise",
+            "multiple-choice": "#/components/schemas/ExerciseMultipleChoiceExercise",
+            "declension-table": "#/components/schemas/ExerciseDeclensionTableExercise"
+          }
+        }
+      },
+      "ExerciseDeclensionTableExercise": {
+        "required": [
+          "word",
+          "rows",
+          "id",
+          "lesson",
+          "instruction",
+          "translation"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "declension-table"
+            ],
+            "type": "string"
+          },
+          "word": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeclensionRow"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "lesson": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "translation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ExerciseFillGapExercise": {
+        "required": [
+          "sentence",
+          "base",
+          "id",
+          "lesson",
+          "instruction",
+          "translation"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "fill-gap"
+            ],
+            "type": "string"
+          },
+          "sentence": {
+            "$ref": "#/components/schemas/GapText"
+          },
+          "base": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "lesson": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "translation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ExerciseMultipleChoiceExercise": {
+        "required": [
+          "prompt",
+          "options",
+          "id",
+          "lesson",
+          "instruction",
+          "translation"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "multiple-choice"
+            ],
+            "type": "string"
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/GapText"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "lesson": {
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "translation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ExerciseSet": {
+        "required": [
+          "lesson",
+          "number",
+          "title",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "lesson": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ExerciseSetsResponse": {
+        "required": [
+          "sets"
+        ],
+        "type": "object",
+        "properties": {
+          "sets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExerciseSet"
             }
           }
         }
@@ -556,6 +958,31 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/FormHit"
+            }
+          }
+        }
+      },
+      "GapText": {
+        "required": [
+          "before",
+          "hasGap",
+          "after"
+        ],
+        "type": "object",
+        "properties": {
+          "before": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          },
+          "hasGap": {
+            "type": "boolean"
+          },
+          "after": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
             }
           }
         }
@@ -767,6 +1194,35 @@
           }
         }
       },
+      "SessionResponse": {
+        "required": [
+          "lesson",
+          "exercises"
+        ],
+        "type": "object",
+        "properties": {
+          "lesson": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Exercise"
+            }
+          }
+        }
+      },
+      "Verdict": {
+        "enum": [
+          "correct",
+          "almost",
+          "wrong",
+          "skipped"
+        ]
+      },
       "VersionResponse": {
         "required": [
           "name",
@@ -793,6 +1249,9 @@
     },
     {
       "name": "CheatSheet"
+    },
+    {
+      "name": "Exercises"
     }
   ]
 }

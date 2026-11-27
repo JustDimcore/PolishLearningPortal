@@ -1,0 +1,148 @@
+lesson: dopelniacz
+exercises:
+  - id: dop-01
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: Idę do ___.
+    base: sklep
+    answers: [sklepu]
+    translation: Я иду в магазин.
+    explanation: "После *do* — родительный. У неодушевлённых м. р. бывает -u или -a, *sklep* — из слов на -u."
+
+  - id: dop-02
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: Poproszę butelkę ___.
+    base: woda
+    answers: [wody]
+    translation: Бутылку воды, пожалуйста.
+    explanation: "После *butelka* — родительный. Женский род на -a: *woda → wody*."
+
+  - id: dop-03
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: Nie mam ___.
+    base: czas
+    answers: [czasu]
+    translation: У меня нет времени.
+    explanation: "После *nie mam* — родительный. *czas* — из слов на -u."
+
+  - id: dop-04
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: To jest samochód ___.
+    base: brat
+    answers: [brata]
+    translation: Это машина брата.
+    explanation: "Принадлежность — родительный. Одушевлённые мужского рода на согласную — -a: *brat → brata*."
+
+  - id: dop-05
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: Kilogram ___, proszę.
+    base: ser
+    answers: [sera]
+    translation: Килограмм сыра, пожалуйста.
+    explanation: "После *kilogram* — родительный. *ser* — из слов на -a."
+
+  - id: dop-06
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: Nie ma już ___.
+    base: chleb
+    answers: [chleba]
+    translation: Хлеба уже нет.
+    explanation: "После *nie ma* — родительный. *chleb* — из слов на -a."
+
+  - id: dop-07
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: Szklanka ___.
+    base: mleko
+    answers: [mleka]
+    translation: Стакан молока.
+    explanation: "Средний род — в родительном -a: *mleko → mleka*."
+
+  - id: dop-08
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: To prezent dla ___.
+    base: mama
+    answers: [mamy]
+    translation: Это подарок для мамы.
+    explanation: "После *dla* — родительный. Женский род на -a: *mama → mamy*."
+
+  - id: dop-09
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: Idę do ___.
+    base: praca
+    answers: [pracy]
+    translation: Я иду на работу.
+    explanation: "После *do* — родительный. После c остаётся -y: *praca → pracy*. И «на работу» — *do pracy*, а не «na pracę»."
+
+  - id: dop-10
+    type: fill-gap
+    instruction: Вставьте слово в нужной форме
+    sentence: To jest kurtka dla ___.
+    base: mężczyzna
+    answers: [mężczyzny]
+    translation: Это куртка для мужчины.
+    explanation: "Мужские слова на -a склоняются как женские: *mężczyzna → mężczyzny*."
+
+  - id: dop-11
+    type: multiple-choice
+    instruction: Выберите правильную форму
+    prompt: Wychodzę z ___.
+    options: [domu, doma, dom]
+    answer: domu
+    translation: Я выхожу из дома.
+    explanation: "*z* в значении «откуда» — родительный. *dom* — из слов на -u."
+
+  - id: dop-12
+    type: multiple-choice
+    instruction: Выберите правильную форму
+    prompt: Nie mam ___.
+    options: [książki, książky, książka]
+    answer: książki
+    translation: У меня нет книги.
+    explanation: "После k вместо -y пишется -i: *książka → książki*."
+
+  - id: dop-13
+    type: multiple-choice
+    instruction: Выберите правильную форму
+    prompt: To jest pokój ___.
+    options: [siostry, siostra, siostru]
+    answer: siostry
+    translation: Это комната сестры.
+    explanation: "Принадлежность — родительный. Женский род на -a: *siostra → siostry*."
+
+  - id: dop-14
+    type: declension-table
+    instruction: Заполните таблицу
+    word: kobieta
+    translation: женщина
+    rows:
+      - label: Именительный · ед. ч.
+        answer: kobieta
+        given: true
+      - label: Родительный · ед. ч.
+        answer: kobiety
+      - label: Именительный · мн. ч.
+        answer: kobiety
+    explanation: "У *kobieta* родительный ед. ч. и именительный мн. ч. совпадают: *kobiety*. Различает их контекст. Но так не у всех слов: *ulica → ulicy*, мн. ч. *ulice*."
+
+  - id: dop-15
+    type: declension-table
+    instruction: Заполните таблицу
+    word: okno
+    translation: окно
+    rows:
+      - label: Именительный · ед. ч.
+        answer: okno
+        given: true
+      - label: Родительный · ед. ч.
+        answer: okna
+      - label: Именительный · мн. ч.
+        answer: okna
+    explanation: "У *okno*, как у большинства слов среднего рода, родительный ед. ч. и именительный мн. ч. совпадают: *okna*."

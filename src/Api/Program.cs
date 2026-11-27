@@ -1,5 +1,6 @@
 using PolishApp.Api.Features.AppInfo;
 using PolishApp.Api.Features.CheatSheet;
+using PolishApp.Api.Features.Exercises;
 using PolishApp.Api.Features.Lessons;
 using PolishApp.Api.Infrastructure;
 using Scalar.AspNetCore;
@@ -23,12 +24,14 @@ try
     builder.Services.AddHealthChecks();
     builder.Services.AddLessons(builder.Configuration);
     builder.Services.AddCheatSheet(builder.Configuration);
+    builder.Services.AddExercises(builder.Configuration);
 
     var app = builder.Build();
 
     // Load content eagerly: an invalid lesson stops startup instead of failing the first request.
     app.Services.GetRequiredService<LessonCatalog>();
     app.Services.GetRequiredService<CheatSheetStore>();
+    app.Services.GetRequiredService<ExerciseBank>();
 
     app.UseExceptionHandler();
     app.UseStatusCodePages();
@@ -46,6 +49,7 @@ try
     api.MapAppInfoEndpoints();
     api.MapLessonsEndpoints();
     api.MapCheatSheetEndpoints();
+    api.MapExercisesEndpoints();
 
     // Unknown /api/* routes return a ProblemDetails 404 instead of the client's index.html.
     api.MapFallback(() => Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Resource not found"));
