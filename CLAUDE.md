@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Статус проекта
 
-Есть каркас (API с health/version/OpenAPI/логами/трассировкой, React-клиент, Docker, compose, CI) и первая фича волны 1 — **уроки** (Mianownik, Dopełniacz). Остальные разделы — заглушки. Дизайн согласован в макетах (Artifact «Polish App — направления дизайна», страница «Раунд 4 · Mów po polsku!»). Пометка «план» — то, чего в коде ещё нет; при реализации убирай её.
+Есть каркас (API с health/version/OpenAPI/логами/трассировкой, React-клиент, Docker, compose, CI) и фичи волны 1: **уроки** (Mianownik, Dopełniacz) и **шпаргалка** с поиском формы и печатью A4. Задания и «Мои ошибки» — заглушки. Дизайн согласован в макетах (Artifact «Polish App — направления дизайна», страница «Раунд 4 · Mów po polsku!»). Пометка «план» — то, чего в коде ещё нет; при реализации убирай её.
 
 ## Команды
 
@@ -64,16 +64,20 @@ docker compose up --build             # приложение: http://127.0.0.1:8
 ## Архитектура
 
 ```
-content/              уроки (формат — content/README.md); шпаргалки, банк заданий (план)
+content/              уроки, шпаргалка (формат — content/README.md); банк заданий (план)
 src/Api/
   Features/AppInfo/   GET /api/version
-  Features/Lessons/   разбор Markdown урока в блоки, каталог курса, GET /api/lessons[/{slug}]
+  Features/Content/   общий разбор Markdown в разделы и блоки, ошибки контента
+  Features/Lessons/   урок (front-matter), каталог курса, GET /api/lessons[/{slug}]
+  Features/CheatSheet/ шпаргалка, индекс форм по ячейкам таблиц, GET /api/cheatsheet[/search?q=]
   Infrastructure/     логи, трассировка, health (/health/live, /health/ready)
 tests/Api.Tests/      тесты API: парсер, каталог, эндпоинты (на настоящем content/)
 web/src/
   app/                роутер и общий layout (шапка с разделами)
-  features/lessons/   рендер блоков урока, навигация по курсу
-  pages/              страницы разделов (уроки; остальное — заглушки)
+  features/content/   рендер блоков (общий для уроков и шпаргалки)
+  features/lessons/   навигация по курсу
+  features/cheatsheet/ поиск формы и оглавление листа
+  pages/              страницы разделов (уроки, шпаргалка; остальное — заглушки)
   shared/api/         fetcher + generated/ (Orval)
 ```
 

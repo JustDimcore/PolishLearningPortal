@@ -4,10 +4,10 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { ContentBlockParagraphBlockType } from './contentBlockParagraphBlockType';
 import type { InlineSpan } from './inlineSpan';
-import type { LessonBlockParagraphBlockType } from './lessonBlockParagraphBlockType';
 
-export interface LessonBlockParagraphBlock {
-  type: LessonBlockParagraphBlockType;
+export interface ContentBlockParagraphBlock {
+  type: ContentBlockParagraphBlockType;
   content: InlineSpan[];
 }

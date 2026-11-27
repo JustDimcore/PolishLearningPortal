@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using PolishApp.Api.Features.Content;
 
 namespace PolishApp.Api.Features.Lessons;
 
 internal static class LessonsEndpoints
 {
-    /// <summary>Registers the lesson catalog. Content is read from <c>Content:Path</c>, by default <c>content/</c> next to the app.</summary>
+    /// <summary>Registers the lesson catalog, read from the content directory (<see cref="ContentPaths"/>).</summary>
     public static IServiceCollection AddLessons(this IServiceCollection services, IConfiguration configuration)
     {
-        var path = configuration["Content:Path"] ?? Path.Combine(AppContext.BaseDirectory, "content");
-        services.AddSingleton(_ => LessonCatalog.Load(path));
+        services.AddSingleton(_ => LessonCatalog.Load(ContentPaths.Root(configuration)));
         return services;
     }
 

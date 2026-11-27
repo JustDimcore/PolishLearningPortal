@@ -4,11 +4,11 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { LessonBlock } from './lessonBlock';
+import type { ContentBlock } from './contentBlock';
 
-export interface LessonSection {
+export interface ContentSection {
   id: string;
   number: number;
   title: string;
-  blocks: LessonBlock[];
+  blocks: ContentBlock[];
 }

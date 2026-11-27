@@ -87,7 +87,8 @@ export const GetLessonResponse = zod.object({
   "marks": zod.array(zod.enum(['bold', 'italic', 'ending']))
 }))
 }))
-}))
+})),
+  "hasRowHeaders": zod.boolean()
 }),zod.object({
   "type": zod.enum(['examples']),
   "items": zod.array(zod.object({

@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router'
 import { CourseNav } from '../../features/lessons/CourseNav.tsx'
-import { LessonBlocks } from '../../features/lessons/LessonBlocks.tsx'
-import { RichText } from '../../features/lessons/RichText.tsx'
+import { ContentBlocks } from '../../features/content/ContentBlocks.tsx'
+import { RichText } from '../../features/content/RichText.tsx'
 import { format, t } from '../../i18n/index.ts'
 import { ApiError } from '../../shared/api/fetcher.ts'
 import { useGetCourse, useGetLesson } from '../../shared/api/generated/lessons/lessons.ts'
@@ -85,7 +85,7 @@ function LessonView({ lesson }: { lesson: LessonDetail }) {
               <span className="text-vermilion-dark">{sectionNumber(section.number)}</span>
               {section.title}
             </h2>
-            <LessonBlocks blocks={section.blocks} />
+            <ContentBlocks sectionId={section.id} blocks={section.blocks} />
           </section>
         ))}
 

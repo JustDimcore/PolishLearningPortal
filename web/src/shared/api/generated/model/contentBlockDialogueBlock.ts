@@ -4,11 +4,11 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { ContentBlockDialogueBlockType } from './contentBlockDialogueBlockType';
 import type { DialogueLine } from './dialogueLine';
-import type { LessonBlockDialogueBlockType } from './lessonBlockDialogueBlockType';
 
-export interface LessonBlockDialogueBlock {
-  type: LessonBlockDialogueBlockType;
+export interface ContentBlockDialogueBlock {
+  type: ContentBlockDialogueBlockType;
   /** @nullable */
   caption: string | null;
   lines: DialogueLine[];

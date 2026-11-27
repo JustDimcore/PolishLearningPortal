@@ -1,3 +1,4 @@
+using PolishApp.Api.Features.Content;
 using PolishApp.Api.Features.Lessons;
 
 namespace PolishApp.Api.Tests;

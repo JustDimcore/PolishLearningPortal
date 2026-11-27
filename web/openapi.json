@@ -87,10 +87,315 @@
           }
         }
       }
+    },
+    "/api/cheatsheet": {
+      "get": {
+        "tags": [
+          "CheatSheet"
+        ],
+        "summary": "The cheat sheet: declension, prepositions, numbers",
+        "operationId": "GetCheatSheet",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheatSheetResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cheatsheet/search": {
+      "get": {
+        "tags": [
+          "CheatSheet"
+        ],
+        "summary": "Find a word form in the cheat sheet tables",
+        "operationId": "SearchForms",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "A word form, diacritics optional: kobiecie, kobiete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FormSearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CheatSheetResponse": {
+        "required": [
+          "title",
+          "summary",
+          "sections"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentSection"
+            }
+          }
+        }
+      },
+      "ContentBlock": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ContentBlockParagraphBlock"
+          },
+          {
+            "$ref": "#/components/schemas/ContentBlockNoteBlock"
+          },
+          {
+            "$ref": "#/components/schemas/ContentBlockBulletListBlock"
+          },
+          {
+            "$ref": "#/components/schemas/ContentBlockTableBlock"
+          },
+          {
+            "$ref": "#/components/schemas/ContentBlockExamplesBlock"
+          },
+          {
+            "$ref": "#/components/schemas/ContentBlockDialogueBlock"
+          },
+          {
+            "$ref": "#/components/schemas/ContentBlockCardBlock"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "paragraph": "#/components/schemas/ContentBlockParagraphBlock",
+            "note": "#/components/schemas/ContentBlockNoteBlock",
+            "list": "#/components/schemas/ContentBlockBulletListBlock",
+            "table": "#/components/schemas/ContentBlockTableBlock",
+            "examples": "#/components/schemas/ContentBlockExamplesBlock",
+            "dialogue": "#/components/schemas/ContentBlockDialogueBlock",
+            "card": "#/components/schemas/ContentBlockCardBlock"
+          }
+        }
+      },
+      "ContentBlockBulletListBlock": {
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "list"
+            ],
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichLine"
+            }
+          }
+        }
+      },
+      "ContentBlockCardBlock": {
+        "required": [
+          "title",
+          "caption",
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "card"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "caption": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichLine"
+            }
+          }
+        }
+      },
+      "ContentBlockDialogueBlock": {
+        "required": [
+          "caption",
+          "lines"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "dialogue"
+            ],
+            "type": "string"
+          },
+          "caption": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DialogueLine"
+            }
+          }
+        }
+      },
+      "ContentBlockExamplesBlock": {
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "examples"
+            ],
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExampleItem"
+            }
+          }
+        }
+      },
+      "ContentBlockNoteBlock": {
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "note"
+            ],
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          }
+        }
+      },
+      "ContentBlockParagraphBlock": {
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "paragraph"
+            ],
+            "type": "string"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InlineSpan"
+            }
+          }
+        }
+      },
+      "ContentBlockTableBlock": {
+        "required": [
+          "header",
+          "rows",
+          "hasRowHeaders"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "table"
+            ],
+            "type": "string"
+          },
+          "header": {
+            "$ref": "#/components/schemas/RichRow"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RichRow"
+            }
+          },
+          "hasRowHeaders": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ContentSection": {
+        "required": [
+          "id",
+          "number",
+          "title",
+          "blocks"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContentBlock"
+            }
+          }
+        }
+      },
       "CourseGroup": {
         "required": [
           "id",
@@ -183,6 +488,78 @@
           }
         }
       },
+      "FormHit": {
+        "required": [
+          "form",
+          "sectionId",
+          "sectionNumber",
+          "sectionTitle",
+          "block",
+          "row",
+          "column",
+          "rowLabel",
+          "columnLabel"
+        ],
+        "type": "object",
+        "properties": {
+          "form": {
+            "type": "string"
+          },
+          "sectionId": {
+            "type": "string"
+          },
+          "sectionNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionTitle": {
+            "type": "string"
+          },
+          "block": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "row": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "column": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rowLabel": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "columnLabel": {
+            "type": "string"
+          }
+        }
+      },
+      "FormSearchResponse": {
+        "required": [
+          "query",
+          "exact",
+          "hits"
+        ],
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "exact": {
+            "type": "boolean"
+          },
+          "hits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FormHit"
+            }
+          }
+        }
+      },
       "InlineMark": {
         "enum": [
           "bold",
@@ -204,202 +581,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InlineMark"
-            }
-          }
-        }
-      },
-      "LessonBlock": {
-        "required": [
-          "type"
-        ],
-        "type": "object",
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/LessonBlockParagraphBlock"
-          },
-          {
-            "$ref": "#/components/schemas/LessonBlockNoteBlock"
-          },
-          {
-            "$ref": "#/components/schemas/LessonBlockBulletListBlock"
-          },
-          {
-            "$ref": "#/components/schemas/LessonBlockTableBlock"
-          },
-          {
-            "$ref": "#/components/schemas/LessonBlockExamplesBlock"
-          },
-          {
-            "$ref": "#/components/schemas/LessonBlockDialogueBlock"
-          },
-          {
-            "$ref": "#/components/schemas/LessonBlockCardBlock"
-          }
-        ],
-        "discriminator": {
-          "propertyName": "type",
-          "mapping": {
-            "paragraph": "#/components/schemas/LessonBlockParagraphBlock",
-            "note": "#/components/schemas/LessonBlockNoteBlock",
-            "list": "#/components/schemas/LessonBlockBulletListBlock",
-            "table": "#/components/schemas/LessonBlockTableBlock",
-            "examples": "#/components/schemas/LessonBlockExamplesBlock",
-            "dialogue": "#/components/schemas/LessonBlockDialogueBlock",
-            "card": "#/components/schemas/LessonBlockCardBlock"
-          }
-        }
-      },
-      "LessonBlockBulletListBlock": {
-        "required": [
-          "items"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "list"
-            ],
-            "type": "string"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RichLine"
-            }
-          }
-        }
-      },
-      "LessonBlockCardBlock": {
-        "required": [
-          "title",
-          "caption",
-          "items"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "card"
-            ],
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "caption": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RichLine"
-            }
-          }
-        }
-      },
-      "LessonBlockDialogueBlock": {
-        "required": [
-          "caption",
-          "lines"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "dialogue"
-            ],
-            "type": "string"
-          },
-          "caption": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "lines": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DialogueLine"
-            }
-          }
-        }
-      },
-      "LessonBlockExamplesBlock": {
-        "required": [
-          "items"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "examples"
-            ],
-            "type": "string"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExampleItem"
-            }
-          }
-        }
-      },
-      "LessonBlockNoteBlock": {
-        "required": [
-          "content"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "note"
-            ],
-            "type": "string"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InlineSpan"
-            }
-          }
-        }
-      },
-      "LessonBlockParagraphBlock": {
-        "required": [
-          "content"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "paragraph"
-            ],
-            "type": "string"
-          },
-          "content": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InlineSpan"
-            }
-          }
-        }
-      },
-      "LessonBlockTableBlock": {
-        "required": [
-          "header",
-          "rows"
-        ],
-        "properties": {
-          "type": {
-            "enum": [
-              "table"
-            ],
-            "type": "string"
-          },
-          "header": {
-            "$ref": "#/components/schemas/RichRow"
-          },
-          "rows": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RichRow"
             }
           }
         }
@@ -448,7 +629,7 @@
           "sections": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/LessonSection"
+              "$ref": "#/components/schemas/ContentSection"
             }
           },
           "previous": {
@@ -519,33 +700,6 @@
           },
           "subtitle": {
             "type": "string"
-          }
-        }
-      },
-      "LessonSection": {
-        "required": [
-          "id",
-          "number",
-          "title",
-          "blocks"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "number": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "title": {
-            "type": "string"
-          },
-          "blocks": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LessonBlock"
-            }
           }
         }
       },
@@ -636,6 +790,9 @@
     },
     {
       "name": "Lessons"
+    },
+    {
+      "name": "CheatSheet"
     }
   ]
 }

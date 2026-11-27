@@ -1,2 +1,3 @@
 export * from './app-info/app-info.zod';
+export * from './cheat-sheet/cheat-sheet.zod';
 export * from './lessons/lessons.zod';

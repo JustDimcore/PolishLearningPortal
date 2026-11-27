@@ -1,27 +1,10 @@
 using System.Text;
+using PolishApp.Api.Features.Content;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace PolishApp.Api.Features.Lessons;
-
-/// <summary>Thrown at startup when the content directory has errors; the message lists all of them.</summary>
-internal sealed class ContentValidationException(IReadOnlyList<ContentError> errors)
-    : Exception(FormatMessage(errors))
-{
-    public IReadOnlyList<ContentError> Errors { get; } = errors;
-
-    private static string FormatMessage(IReadOnlyList<ContentError> errors)
-    {
-        var builder = new StringBuilder($"Content has {errors.Count} error(s):");
-        foreach (var error in errors)
-        {
-            builder.Append("\n  ").Append(error);
-        }
-
-        return builder.ToString();
-    }
-}
 
 /// <summary>All lessons of the course, loaded and validated once at startup.</summary>
 internal sealed class LessonCatalog
@@ -58,7 +41,7 @@ internal sealed class LessonCatalog
             foreach (var path in Directory.EnumerateFiles(lessonsPath, "*.md").Order(StringComparer.Ordinal))
             {
                 var file = $"{LessonsDirectory}/{Path.GetFileName(path)}";
-                if (LessonParser.Parse(file, File.ReadAllText(path, Encoding.UTF8), errors) is { } document)
+                if (LessonDocument.Read(file, File.ReadAllText(path, Encoding.UTF8), errors) is { } document)
                 {
                     documents[document.Slug] = document;
                 }

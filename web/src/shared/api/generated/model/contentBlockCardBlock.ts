@@ -4,11 +4,11 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { LessonBlockCardBlockType } from './lessonBlockCardBlockType';
+import type { ContentBlockCardBlockType } from './contentBlockCardBlockType';
 import type { RichLine } from './richLine';
 
-export interface LessonBlockCardBlock {
-  type: LessonBlockCardBlockType;
+export interface ContentBlockCardBlock {
+  type: ContentBlockCardBlockType;
   title: string;
   /** @nullable */
   caption: string | null;

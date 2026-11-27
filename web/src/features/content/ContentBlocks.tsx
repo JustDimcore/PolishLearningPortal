@@ -1,18 +1,24 @@
 import type { ReactNode } from 'react'
 import type {
-  LessonBlock,
-  LessonBlockCardBlock,
-  LessonBlockDialogueBlock,
-  LessonBlockExamplesBlock,
-  LessonBlockTableBlock,
+  ContentBlock,
+  ContentBlockCardBlock,
+  ContentBlockDialogueBlock,
+  ContentBlockExamplesBlock,
+  ContentBlockTableBlock,
 } from '../../shared/api/generated/model'
+import { cellId } from './cellId.ts'
 import { RichText } from './RichText.tsx'
+
+type Props = {
+  sectionId: string
+  blocks: readonly ContentBlock[]
+}
 
 /**
  * Renders the blocks of one section. A card is shown side by side with the block that follows it
  * (a shopping list next to the dialogue that uses it).
  */
-export function LessonBlocks({ blocks }: { blocks: readonly LessonBlock[] }) {
+export function ContentBlocks({ sectionId, blocks }: Props) {
   const items: ReactNode[] = []
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i]
@@ -22,19 +28,19 @@ export function LessonBlocks({ blocks }: { blocks: readonly LessonBlock[] }) {
         <div key={i} className="flex flex-wrap items-start gap-11">
           <Card block={block} />
           <div className="min-w-0 flex-[1_1_360px]">
-            <Block block={next} />
+            <Block block={next} index={i + 1} sectionId={sectionId} />
           </div>
         </div>,
       )
       i++
     } else {
-      items.push(<Block key={i} block={block} />)
+      items.push(<Block key={i} block={block} index={i} sectionId={sectionId} />)
     }
   }
   return <div className="flex flex-col gap-4">{items}</div>
 }
 
-function Block({ block }: { block: LessonBlock }) {
+function Block({ block, index, sectionId }: { block: ContentBlock; index: number; sectionId: string }) {
   switch (block.type) {
     case 'paragraph':
       return (
@@ -61,7 +67,7 @@ function Block({ block }: { block: LessonBlock }) {
         </ul>
       )
     case 'table':
-      return <Table block={block} />
+      return <Table block={block} id={(row, column) => cellId(sectionId, index, row, column)} />
     case 'examples':
       return <Examples block={block} />
     case 'dialogue':
@@ -71,7 +77,7 @@ function Block({ block }: { block: LessonBlock }) {
   }
 }
 
-function Examples({ block }: { block: LessonBlockExamplesBlock }) {
+function Examples({ block }: { block: ContentBlockExamplesBlock }) {
   return (
     <dl className="m-0 border-t-[1.5px] border-b-[1.5px] border-ink">
       {block.items.map((item, i) => (
@@ -94,15 +100,18 @@ function Examples({ block }: { block: LessonBlockExamplesBlock }) {
   )
 }
 
-function Table({ block }: { block: LessonBlockTableBlock }) {
+function Table({ block, id }: { block: ContentBlockTableBlock; id: (row: number, column: number) => string }) {
+  // Italic in a data cell is an aside ("(but chleba)"): muted and smaller than the forms themselves.
+  const cell =
+    'scroll-mt-24 px-2 py-2 align-top first:pl-0 target:bg-vermilion/15 target:outline-2 target:outline-vermilion [&_i]:text-sm [&_i]:text-muted'
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[520px] border-collapse text-base">
         <thead>
           <tr className="border-y-[1.5px] border-ink text-left font-display text-sm tracking-[0.06em] uppercase">
-            {block.header.cells.map((cell, i) => (
+            {block.header.cells.map((c, i) => (
               <th key={i} scope="col" className="px-2 py-2 font-medium first:pl-0">
-                <RichText spans={cell.content} />
+                <RichText spans={c.content} />
               </th>
             ))}
           </tr>
@@ -110,11 +119,17 @@ function Table({ block }: { block: LessonBlockTableBlock }) {
         <tbody>
           {block.rows.map((row, r) => (
             <tr key={r} className="border-b border-hairline last:border-b-[1.5px] last:border-ink">
-              {row.cells.map((cell, c) => (
-                <td key={c} className="px-2 py-2 align-top first:pl-0">
-                  <RichText spans={cell.content} />
-                </td>
-              ))}
+              {row.cells.map((c, i) =>
+                block.hasRowHeaders && i === 0 ? (
+                  <th key={i} scope="row" className="py-2 pr-4 text-left align-top text-[15px] font-normal text-muted [&_b]:block [&_b]:font-display [&_b]:text-base [&_b]:text-ink">
+                    <RichText spans={c.content} />
+                  </th>
+                ) : (
+                  <td key={i} id={id(r, i)} className={cell}>
+                    <RichText spans={c.content} />
+                  </td>
+                ),
+              )}
             </tr>
           ))}
         </tbody>
@@ -123,7 +138,7 @@ function Table({ block }: { block: LessonBlockTableBlock }) {
   )
 }
 
-function Dialogue({ block }: { block: LessonBlockDialogueBlock }) {
+function Dialogue({ block }: { block: ContentBlockDialogueBlock }) {
   return (
     <div className="flex flex-col gap-2.5">
       {block.caption && <div className="kicker">{block.caption}</div>}
@@ -153,7 +168,7 @@ function Dialogue({ block }: { block: LessonBlockDialogueBlock }) {
   )
 }
 
-function Card({ block }: { block: LessonBlockCardBlock }) {
+function Card({ block }: { block: ContentBlockCardBlock }) {
   return (
     <figure className="m-0 flex flex-[0_1_240px] flex-col gap-2">
       {block.caption && <figcaption className="kicker">{block.caption}</figcaption>}

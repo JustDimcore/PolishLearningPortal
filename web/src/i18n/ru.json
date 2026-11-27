@@ -1,7 +1,4 @@
 {
-  "app": {
-    "badge": "ZESZYT 02"
-  },
   "nav": {
     "label": "Разделы",
     "lessons": "Уроки",
@@ -10,14 +7,11 @@
     "mistakes": "Мои ошибки"
   },
   "apiStatus": {
-    "label": "API:",
-    "connecting": "подключение…",
-    "unavailable": "недоступен"
+    "unavailable": "Сервер недоступен: уроки и шпаргалка не загрузятся. Запустите API — страница обновится сама."
   },
   "placeholder": {
     "kicker": "Скоро",
     "exercises": "Сессии по 10 заданий с разбором Claude.",
-    "cheatsheet": "Таблицы склонения, предлоги, числа.",
     "mistakes": "Ошибки из сессий и повторение."
   },
   "notFound": {
@@ -41,5 +35,21 @@
     "courseLoadError": "Не удалось загрузить список уроков. Проверьте, что API запущен.",
     "notFoundTitle": "Урок не найден",
     "notFoundNote": "Такого урока нет в курсе."
+  },
+  "cheatsheet": {
+    "sideLabel": "Таблицы",
+    "searchLabel": "Поиск формы",
+    "searchPlaceholder": "найти: kobiecie…",
+    "toc": "На этом листе",
+    "tocToggle": "Таблицы",
+    "print": "Печать A4",
+    "found": "Найдено · {count}",
+    "similar": "Точной формы нет. Похожие · {count}",
+    "notFound": "Ничего не найдено",
+    "notFoundNote": "Такой формы на этом листе нет. Диакритику можно не ставить: kobiete найдёт kobietę.",
+    "searching": "Поиск…",
+    "loading": "Загрузка…",
+    "loadError": "Не удалось загрузить шпаргалку. Проверьте, что API запущен.",
+    "searchError": "Поиск не удался. Проверьте, что API запущен."
   }
 }

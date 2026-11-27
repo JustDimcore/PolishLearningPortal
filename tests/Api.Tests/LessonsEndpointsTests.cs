@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using PolishApp.Api.Features.Content;
 using PolishApp.Api.Features.Lessons;
 
 namespace PolishApp.Api.Tests;

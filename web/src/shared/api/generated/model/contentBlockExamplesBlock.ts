@@ -4,10 +4,10 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { ContentBlockExamplesBlockType } from './contentBlockExamplesBlockType';
 import type { ExampleItem } from './exampleItem';
-import type { LessonBlockExamplesBlockType } from './lessonBlockExamplesBlockType';
 
-export interface LessonBlockExamplesBlock {
-  type: LessonBlockExamplesBlockType;
+export interface ContentBlockExamplesBlock {
+  type: ContentBlockExamplesBlockType;
   items: ExampleItem[];
 }

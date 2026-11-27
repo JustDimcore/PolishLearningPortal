@@ -57,3 +57,30 @@
   text-transform: uppercase;
   color: var(--color-muted);
 }
+
+/* Printing (the cheat sheet's "Print A4"): only the content column, on plain paper. */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  body {
+    background: none;
+    font-size: 11pt;
+  }
+
+  table {
+    min-width: 0 !important;
+  }
+
+  tr,
+  h2 {
+    break-inside: avoid;
+    break-after: avoid;
+  }
+}

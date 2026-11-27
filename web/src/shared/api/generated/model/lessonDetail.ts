@@ -4,10 +4,10 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { ContentSection } from './contentSection';
 import type { InlineSpan } from './inlineSpan';
 import type { LessonGroupPosition } from './lessonGroupPosition';
 import type { LessonLink } from './lessonLink';
-import type { LessonSection } from './lessonSection';
 
 export interface LessonDetail {
   slug: string;
@@ -17,7 +17,7 @@ export interface LessonDetail {
   summary: InlineSpan[];
   minutes: number;
   group: LessonGroupPosition;
-  sections: LessonSection[];
+  sections: ContentSection[];
   previous: null | LessonLink;
   next: null | LessonLink;
 }

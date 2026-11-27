@@ -4,9 +4,12 @@ import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-rout
 import { vi } from 'vitest'
 
 /** Renders routes at a path with a fresh query client (no retries). */
-export function renderRoutes(routes: RouteObject[], path: string) {
+export function renderRoutes(
+  routes: RouteObject[],
+  path: string,
+  client = new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+) {
   const router = createMemoryRouter(routes, { initialEntries: [path] })
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
       <RouterProvider router={router} />

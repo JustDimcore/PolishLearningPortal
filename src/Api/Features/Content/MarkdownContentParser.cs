@@ -9,7 +9,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Md = Markdig.Syntax;
 
-namespace PolishApp.Api.Features.Lessons;
+namespace PolishApp.Api.Features.Content;
 
 /// <summary>A problem found in a content file. <paramref name="Line"/> is 1-based, 0 when unknown.</summary>
 internal sealed record ContentError(string File, int Line, string Message)
@@ -17,20 +17,14 @@ internal sealed record ContentError(string File, int Line, string Message)
     public override string ToString() => Line > 0 ? $"{File}:{Line}: {Message}" : $"{File}: {Message}";
 }
 
-/// <summary>A lesson as written in its file, before it is placed into the course.</summary>
-internal sealed record LessonDocument(
-    string Slug,
-    string Title,
-    string Subtitle,
-    IReadOnlyList<InlineSpan> Summary,
-    int Minutes,
-    IReadOnlyList<LessonSection> Sections);
+/// <summary>A parsed content file: its front matter and numbered sections.</summary>
+internal sealed record ParsedContent<TMeta>(TMeta Meta, IReadOnlyList<ContentSection> Sections);
 
 /// <summary>
-/// Parses a lesson Markdown file (format: content/README.md) into structured blocks.
+/// Parses content Markdown (format: content/README.md): YAML front matter, then <c>##</c> sections of blocks.
 /// Anything outside the supported subset is reported as an error instead of being passed through.
 /// </summary>
-internal static partial class LessonParser
+internal static partial class MarkdownContentParser
 {
     private const string NotePrefix = "↳ ";
     private const string RemarkPrefix = "↑ ";
@@ -44,16 +38,21 @@ internal static partial class LessonParser
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .Build();
 
-    public static LessonDocument? Parse(string file, string markdown, List<ContentError> errors)
+    /// <summary>
+    /// Parses a file whose front matter deserializes into <typeparamref name="TMeta"/> (unknown keys are errors).
+    /// Returns null when any error was reported; the caller validates the front matter values.
+    /// </summary>
+    public static ParsedContent<TMeta>? Parse<TMeta>(string file, string markdown, List<ContentError> errors)
+        where TMeta : class, new()
     {
         var context = new ParseContext(file, errors);
         var errorsBefore = errors.Count;
         var document = Markdown.Parse(markdown, Pipeline);
 
-        FrontMatter? meta = null;
-        var sections = new List<LessonSection>();
+        TMeta? meta = null;
+        var sections = new List<ContentSection>();
         string? sectionTitle = null;
-        var blocks = new List<LessonBlock>();
+        var blocks = new List<ContentBlock>();
 
         void CloseSection()
         {
@@ -68,7 +67,7 @@ internal static partial class LessonParser
                 context.Error(0, $"Section \"{sectionTitle}\" is empty");
             }
 
-            sections.Add(new LessonSection($"section-{number}", number, sectionTitle, [.. blocks]));
+            sections.Add(new ContentSection($"section-{number}", number, sectionTitle, [.. blocks]));
             blocks.Clear();
         }
 
@@ -78,7 +77,7 @@ internal static partial class LessonParser
 
             if (block is YamlFrontMatterBlock yaml)
             {
-                meta = ParseFrontMatter(yaml, context);
+                meta = ParseFrontMatter<TMeta>(yaml, context);
                 continue;
             }
 
@@ -114,44 +113,33 @@ internal static partial class LessonParser
 
         CloseSection();
 
-        if (meta is null)
+        if (meta is null && errors.Count == errorsBefore)
         {
             context.Error(1, "Missing front matter");
-            return null;
-        }
-
-        var expectedSlug = Path.GetFileNameWithoutExtension(file);
-        if (meta.Slug != expectedSlug)
-        {
-            context.Error(1, $"Slug \"{meta.Slug}\" must match the file name \"{expectedSlug}\"");
-        }
-
-        RequireText(meta.Title, "title", context);
-        RequireText(meta.Subtitle, "subtitle", context);
-        RequireText(meta.Summary, "summary", context);
-        if (meta.Minutes is < 1 or > 120)
-        {
-            context.Error(1, "'minutes' must be between 1 and 120");
         }
 
         if (sections.Count == 0)
         {
-            context.Error(0, "A lesson needs at least one section (##)");
+            context.Error(0, "At least one section (##) is required");
         }
 
-        var summary = meta.Summary is { Length: > 0 } text ? ParseInline(text, 1, context) : [];
-
-        return errors.Count > errorsBefore
-            ? null
-            : new LessonDocument(meta.Slug!, meta.Title!, meta.Subtitle!, summary, meta.Minutes, sections);
+        return errors.Count > errorsBefore || meta is null ? null : new ParsedContent<TMeta>(meta, sections);
     }
 
-    private static FrontMatter? ParseFrontMatter(YamlFrontMatterBlock block, ParseContext context)
+    /// <summary>Parses one line of inline Markdown, such as a summary from front matter.</summary>
+    public static IReadOnlyList<InlineSpan> ParseInline(string file, int line, string text, List<ContentError> errors) =>
+        ParseInline(text, line, new ParseContext(file, errors));
+
+    /// <summary>Plain text of rich text, without formatting.</summary>
+    public static string ToPlainText(IEnumerable<InlineSpan> spans) => string.Concat(spans.Select(s => s.Text));
+
+    private static TMeta? ParseFrontMatter<TMeta>(YamlFrontMatterBlock block, ParseContext context)
+        where TMeta : class, new()
     {
         var yaml = string.Join('\n', block.Lines.Lines.Take(block.Lines.Count).Select(l => l.ToString()));
         try
         {
-            return Yaml.Deserialize<FrontMatter>(yaml) ?? new FrontMatter();
+            return Yaml.Deserialize<TMeta>(yaml) ?? new TMeta();
         }
         catch (YamlException ex)
         {
@@ -161,15 +149,7 @@ internal static partial class LessonParser
         }
     }
 
-    private static void RequireText(string? value, string field, ParseContext context)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            context.Error(1, $"Front matter field '{field}' is required");
-        }
-    }
-
-    private static LessonBlock? ParseBlock(Md.Block block, ParseContext context)
+    private static ContentBlock? ParseBlock(Md.Block block, ParseContext context)
     {
         var line = block.Line + 1;
         switch (block)
@@ -232,10 +212,12 @@ internal static partial class LessonParser
             return null;
         }
 
-        return new TableBlock(rows[0].Row, [.. rows.Skip(1).Select(r => r.Row)]);
+        var header = rows[0].Row;
+        var hasRowHeaders = header.Cells.Count > 1 && header.Cells[0].Content.Count == 0;
+        return new TableBlock(header, [.. rows.Skip(1).Select(r => r.Row)], hasRowHeaders);
     }
 
-    private static LessonBlock? ParseFenced(Md.FencedCodeBlock block, ParseContext context)
+    private static ContentBlock? ParseFenced(Md.FencedCodeBlock block, ParseContext context)
     {
         var firstLine = block.Line + 2; // the line after the opening fence
         var lines = block.Lines.Lines
@@ -260,7 +242,7 @@ internal static partial class LessonParser
             return value;
         }
 
-        LessonBlock? result;
+        ContentBlock? result;
         switch (kind)
         {
             case "examples":
@@ -521,15 +503,5 @@ internal static partial class LessonParser
     private sealed record ParseContext(string File, List<ContentError> Errors)
     {
         public void Error(int line, string message) => Errors.Add(new ContentError(File, line, message));
-    }
-
-    /// <summary>Lesson front matter; unknown keys are rejected by the deserializer.</summary>
-    private sealed class FrontMatter
-    {
-        public string? Slug { get; set; }
-        public string? Title { get; set; }
-        public string? Subtitle { get; set; }
-        public string? Summary { get; set; }
-        public int Minutes { get; set; }
     }
 }

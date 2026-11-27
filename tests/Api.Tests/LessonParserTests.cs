@@ -1,3 +1,4 @@
+using PolishApp.Api.Features.Content;
 using PolishApp.Api.Features.Lessons;
 
 namespace PolishApp.Api.Tests;
@@ -18,7 +19,7 @@ public sealed class LessonParserTests
     private static (LessonDocument? Lesson, List<ContentError> Errors) Parse(string body, string file = "lessons/sample.md")
     {
         var errors = new List<ContentError>();
-        var lesson = LessonParser.Parse(file, FrontMatter + body, errors);
+        var lesson = LessonDocument.Read(file, FrontMatter + body, errors);
         return (lesson, errors);
     }
 
@@ -175,7 +176,7 @@ public sealed class LessonParserTests
     {
         var errors = new List<ContentError>();
 
-        LessonParser.Parse("lessons/x.md", "---\nslug: x\nlevel: A1\n---\n\n## S\n\nText.", errors);
+        LessonDocument.Read("lessons/x.md", "---\nslug: x\nlevel: A1\n---\n\n## S\n\nText.", errors);
 
         Assert.Contains(errors, e => e.Message.StartsWith("Invalid front matter", StringComparison.Ordinal));
     }

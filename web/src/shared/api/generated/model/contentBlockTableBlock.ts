@@ -4,11 +4,12 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { LessonBlockTableBlockType } from './lessonBlockTableBlockType';
+import type { ContentBlockTableBlockType } from './contentBlockTableBlockType';
 import type { RichRow } from './richRow';
 
-export interface LessonBlockTableBlock {
-  type: LessonBlockTableBlockType;
+export interface ContentBlockTableBlock {
+  type: ContentBlockTableBlockType;
   header: RichRow;
   rows: RichRow[];
+  hasRowHeaders: boolean;
 }
